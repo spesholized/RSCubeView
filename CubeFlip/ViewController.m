@@ -82,6 +82,7 @@
         direction = RSCubeViewRotationDirectionRight;
     }
     
-    [self.cubeView rotateToView:nextView direction:direction duration:0.6 fadeOption:RSCubeViewFadeOptionDarken];
+    [self.cubeView rotateToView:nextView direction:direction duration:.6f];
+    [nextView release];
 }
 @end
