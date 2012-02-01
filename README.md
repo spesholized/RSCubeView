@@ -4,7 +4,7 @@ RSCubeView
 RSCubeView lets you apply 3D rotation effect to a UIView.
 
 ###Usage
-Simply copy 'RSCubeView.h' and 'RSCubeView.m' under the 'RSCubeView/' folder and put '#import RSCubeView.h' in your source files to start using.
+Simply copy `RSCubeView.h` and `RSCubeView.m` under the `RSCubeView/` folder and put `#import RSCubeView.h` in your source files to start using.
 
 ###Example Code:
 
