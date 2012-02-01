@@ -16,12 +16,6 @@ typedef enum {
     RSCubeViewRotationDirectionRight
 } RSCubeViewRotationDirection;
 
-typedef enum {
-    RSCubeViewFadeOptionNone,
-    RSCubeViewFadeOptionDarken,
-    RSCubeViewFadeOptionLighten,
-    RSCubeViewFadeOptionFadeOut
-} RSCubeViewFadeOption;
 
 
 @interface RSCubeView : UIView
@@ -29,7 +23,6 @@ typedef enum {
 @property (nonatomic, retain) IBOutlet UIView* contentView;
 @property (nonatomic, assign) CGFloat focalLength;
 
--(void)rotateToView:(UIView*)aView direction:(RSCubeViewRotationDirection)aDirection;
--(void)rotateToView:(UIView*)aView direction:(RSCubeViewRotationDirection)aDirection duration:(CGFloat)aDuration fadeOption:(RSCubeViewFadeOption)fadeOption;
+-(void)rotateToView:(UIView*)aView direction:(RSCubeViewRotationDirection)aDirection duration:(NSTimeInterval)aDuration;
 
 @end

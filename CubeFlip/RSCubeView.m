@@ -12,8 +12,8 @@
 #define kFlipAnimationKey @"FlipAnimation"
 #define kFadeOutAnimationKey @"FadeOutAnimation"
 #define kFadeInAnimationKey @"FadeInAnimation"
-#define kOpacityVisible 1.f
-#define kOpacityFaded 0.1f
+#define kOpacityTranslucent 0.5f
+#define kOpacityInvisible 0.0f
 #define kDefaultFocalLength 800.f
 
 @interface RSCubeView()
@@ -21,10 +21,11 @@
 @property (nonatomic, retain) UIView* nextView;
 @property (nonatomic, retain) CALayer* transformLayer;
 @property (nonatomic, retain) CALayer* fadeOutLayer;
+@property (nonatomic, retain) CALayer* fadeOutMaskLayer;
 @property (nonatomic, retain) CALayer* fadeInLayer;
+@property (nonatomic, retain) CALayer* fadeInMaskLayer;
 
--(id)captureView:(UIView*)view;
--(CALayer*)makeSurface:(CATransform3D)t withView:(UIView *)aNewView;
+-(CALayer*)layerFromView:(UIView*)aView withTransform:(CATransform3D)transform;
 -(void)moveFrom:(RSCubeViewRotationDirection)aDirection duration:(float)aDuration;
 @end
 
@@ -34,7 +35,9 @@
 @synthesize nextView;
 @synthesize transformLayer;
 @synthesize fadeOutLayer;
+@synthesize fadeOutMaskLayer;
 @synthesize fadeInLayer;
+@synthesize fadeInMaskLayer;
 @synthesize focalLength;
 
 -(id)init
@@ -71,38 +74,51 @@
     [contentView release];
     [nextView release];
     [fadeOutLayer release];
+    [fadeOutMaskLayer release];
     [fadeInLayer release];
+    [fadeInMaskLayer release];
     [transformLayer release];
     [super dealloc];
 }
 
 #pragma mark - Graphics Helper Methods
-//Transition preparation for Cube effect
-- (id) captureView:(UIView*)view {
-    UIGraphicsBeginImageContext(view.frame.size);
-	[view.layer renderInContext:UIGraphicsGetCurrentContext()];
-	UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
-	UIGraphicsEndImageContext();
-    return (id) [newImage CGImage];
-}
-
-- (CALayer*) makeSurface:(CATransform3D)t withView:(UIView *)aNewView{
+- (CALayer*) layerFromView:(UIView*)aView withTransform:(CATransform3D)transform
+{
     CGRect rect = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
     
     CALayer *imageLayer = [CALayer layer];
     imageLayer.anchorPoint = CGPointMake(1, 1);
     imageLayer.frame = rect;
-    imageLayer.transform = t;  
-    imageLayer.contents = [self captureView:aNewView];
-    return imageLayer;
+    imageLayer.transform = transform;
+    
+    //Capture View
+    UIGraphicsBeginImageContext(aView.frame.size);
+	[aView.layer renderInContext:UIGraphicsGetCurrentContext()];
+	UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+	UIGraphicsEndImageContext();
+    
+    imageLayer.contents = (id) newImage.CGImage;
+    return imageLayer; 
 }
-
 -(void)moveFrom:(RSCubeViewRotationDirection)aDirection duration:(float)aDuration
 {
     [CATransaction flush];
     CABasicAnimation *rotation;
     CABasicAnimation *translation;
     CABasicAnimation *translationZ;
+    CABasicAnimation* fadeOut = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    CABasicAnimation* fadeIn = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    
+    fadeOut.fillMode = kCAFillModeForwards;
+    fadeOut.removedOnCompletion = NO;
+    fadeOut.duration = aDuration;
+    fadeOut.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    
+    fadeIn.fillMode = kCAFillModeForwards;
+    fadeIn.removedOnCompletion = NO;
+    fadeIn.duration = aDuration;
+    fadeIn.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
+    
     CAAnimationGroup *group = [CAAnimationGroup animation]; 
     group.delegate = self; 
     group.duration = aDuration;
@@ -139,19 +155,10 @@
         translationZ.toValue = [NSNumber numberWithFloat:-(self.bounds.size.width / 2)];
     }
     
-    CABasicAnimation* fadeOut = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    fadeOut.toValue = [NSNumber numberWithFloat:kOpacityFaded];
-    fadeOut.fillMode = kCAFillModeForwards;
-    fadeOut.removedOnCompletion = NO;
-    fadeOut.duration = aDuration;
-    fadeOut.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    
-    CABasicAnimation* fadeIn = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    fadeIn.toValue = [NSNumber numberWithFloat:kOpacityVisible];
-    fadeIn.fillMode = kCAFillModeForwards;
-    fadeIn.removedOnCompletion = NO;
-    fadeIn.duration = aDuration;
-    fadeIn.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    fadeOut.fromValue = [NSNumber numberWithFloat:0.0f];
+    fadeOut.toValue = [NSNumber numberWithFloat:0.4f];
+    fadeIn.fromValue = [NSNumber numberWithFloat:0.4f];
+    fadeIn.toValue = [NSNumber numberWithFloat:0.0f];
     
     group.animations = [NSArray arrayWithObjects: rotation, translation, translationZ, nil];
     group.fillMode = kCAFillModeForwards; 
@@ -159,8 +166,8 @@
     
     [CATransaction begin];
     [transformLayer addAnimation:group forKey:kFlipAnimationKey];
-    //[fadeOutLayer addAnimation:fadeOut forKey:kFadeOutAnimationKey];
-    //[fadeInLayer addAnimation:fadeIn forKey:kFadeInAnimationKey];
+    [fadeOutMaskLayer addAnimation:fadeOut forKey:kFadeOutAnimationKey];
+    [fadeInMaskLayer addAnimation:fadeIn forKey:kFadeInAnimationKey];
     [CATransaction commit];
 }
 
@@ -173,13 +180,7 @@
     [self addSubview:contentView];
 }
 
-
--(void)rotateToView:(UIView*)aView direction:(RSCubeViewRotationDirection)aDirection
-{
-    [self rotateToView:aView direction:aDirection duration:0.3f fadeOption:RSCubeViewFadeOptionDarken];
-}
-
--(void)rotateToView:(UIView *)aView direction:(RSCubeViewRotationDirection)aDirection duration:(CGFloat)aDuration fadeOption:(RSCubeViewFadeOption)fadeOption
+-(void)rotateToView:(UIView *)aView direction:(RSCubeViewRotationDirection)aDirection duration:(NSTimeInterval)aDuration
 {
     /*
      Overview of steps:
@@ -214,8 +215,22 @@
     
     //Init Fade-out layer. This is the surface that will disappear
     CATransform3D t = CATransform3DMakeTranslation(0.f, 0.f, 0.f);
-    self.fadeOutLayer = [self makeSurface:t withView:contentView];
+    self.fadeOutLayer = [self layerFromView:contentView withTransform:t];
     [transformLayer addSublayer:self.fadeOutLayer];
+    
+    //Init Fade out mask layer, used for fade options
+    UIView* v = [[UIView alloc] initWithFrame:contentView.frame];
+    if (aDirection == RSCubeViewRotationDirectionDown) {
+        v.backgroundColor = [UIColor blackColor];
+    } else if (aDirection == RSCubeViewRotationDirectionUp) {
+        v.backgroundColor = [UIColor whiteColor];
+    } else {
+        v.backgroundColor = [UIColor darkGrayColor];
+    }
+    self.fadeOutMaskLayer = [self layerFromView:v withTransform:t];
+    [transformLayer addSublayer:fadeOutMaskLayer];
+    
+    //Hide the actual content view during animation
     contentView.hidden = YES;
     
     //Init the Fade-In Layer. This is the surface that will appear next
@@ -234,9 +249,20 @@
         t = CATransform3DRotate(t, -M_PI_2, 0, 1, 0);
     }
     
-    self.fadeInLayer = [self makeSurface:t withView:aView];
+    self.fadeInLayer = [self layerFromView:aView withTransform:t];
     //self.fadeInLayer.opacity = kOpacityFaded;
     [transformLayer addSublayer:self.fadeInLayer];
+    
+    //Init the Fade In Layer Mask
+    if (aDirection == RSCubeViewRotationDirectionDown) {
+        v.backgroundColor = [UIColor whiteColor];
+    } else if (aDirection == RSCubeViewRotationDirectionUp) {
+        v.backgroundColor = [UIColor blackColor];
+    } else {
+        v.backgroundColor = [UIColor darkGrayColor];
+    }
+    self.fadeInMaskLayer = [self layerFromView:v withTransform:t];
+    [transformLayer addSublayer:fadeInMaskLayer];
     
     [self moveFrom:aDirection duration:aDuration];
 }
@@ -258,7 +284,9 @@
     
     [transformLayer removeFromSuperlayer];
     self.fadeOutLayer = nil;
+    self.fadeOutMaskLayer = nil;
     self.fadeInLayer = nil;
+    self.fadeInMaskLayer = nil;
     self.transformLayer = nil;
     nextView = nil;
 }
