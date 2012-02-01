@@ -3,7 +3,10 @@ RSCubeView
 
 RSCubeView lets you apply 3D rotation effect to a UIView.
 
-###Example Usage:
+###Usage
+Simply copy 'RSCubeView.h' and 'RSCubeView.m' under the 'RSCubeView/' folder and put '#import RSCubeView.h' in your source files to start using.
+
+###Example Code:
 
     //Perform a 3D rotation on a UIView with a red background to a UIView with a blue background
     
@@ -19,4 +22,4 @@ RSCubeView lets you apply 3D rotation effect to a UIView.
     blueView.backgroundColor = [UIColor blueColor];
         
     cube.contentView = redView;
-    [cube rotateToView:blueView direction:RSCubeViewRotationDirectionDown duration:1.f];'
+    [cube rotateToView:blueView direction:RSCubeViewRotationDirectionDown duration:1.f];
