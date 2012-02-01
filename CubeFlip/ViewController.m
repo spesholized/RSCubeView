@@ -23,7 +23,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+    
+    UIView* contentView = [[[UIView alloc] initWithFrame:self.cubeView.bounds] autorelease];
+    contentView.backgroundColor = [UIColor orangeColor];
+    [self.cubeView setContentView:contentView];
 }
 
 - (void)viewDidUnload
@@ -67,7 +70,7 @@
 - (IBAction)onButtonTapped:(id)sender {
     
     //Alternate between the 2 prototype views
-    UIView* nextView = [[[UIView alloc] initWithFrame:self.cubeView.frame] autorelease];
+    UIView* nextView = [[[UIView alloc] initWithFrame:self.cubeView.bounds] autorelease];
     nextView.backgroundColor = [UIColor orangeColor];
     
     NSInteger tag = ((UIButton*)sender).tag;
@@ -83,6 +86,5 @@
     }
     
     [self.cubeView rotateToView:nextView direction:direction duration:.6f];
-    [nextView release];
 }
 @end

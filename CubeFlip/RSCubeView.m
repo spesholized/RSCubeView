@@ -279,7 +279,6 @@
 - (void)animationDidStop:(CAAnimation *)animation finished:(BOOL)finished {
 	
 	isTransitioning = NO;
-    nextView.frame = contentView.frame;
     self.contentView = nextView;
     
     [transformLayer removeFromSuperlayer];
