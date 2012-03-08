@@ -25,4 +25,5 @@ typedef enum {
 
 -(void)rotateToView:(UIView*)aView direction:(RSCubeViewRotationDirection)aDirection duration:(NSTimeInterval)aDuration;
 
-@end
+@end //RSCubeView
+
