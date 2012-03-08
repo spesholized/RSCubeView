@@ -5,7 +5,9 @@ RSCubeView lets you apply 3D rotation effect to a UIView.
 
 ###Usage
 -Add `QuartzCore.framework` into your XCode project
+
 -Copy `RSCubeView.h` and `RSCubeView.m` under the `CubeFlip/` folder to your project
+
 -Put `#import RSCubeView.h` in your source files to start using.
 
 ###Example Project
