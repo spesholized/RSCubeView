@@ -27,3 +27,9 @@ typedef enum {
 
 @end //RSCubeView
 
+
+@protocol RSCubeViewDelegate <NSObject>
+
+-(void)cubeView:(RSCubeView*)cubeView didSwipeInDirection:(RSCubeViewRotationDirection)direction;
+
+@end
