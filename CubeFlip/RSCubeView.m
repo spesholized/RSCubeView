@@ -44,34 +44,40 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 @synthesize fadeInLayer;
 @synthesize fadeInMaskLayer;
 @synthesize focalLength;
+@synthesize fillContentViewToBounds;
 
--(id)init
+//Designated Initializer
+-(id)initWithCoder:(NSCoder*)aDecoder orFrame:(CGRect)frame
 {
-    self = [super init];
+    if (aDecoder) {
+        self = [super initWithCoder:aDecoder];
+    } else if (!CGRectIsEmpty(frame)) {
+        self = [super initWithFrame:frame];
+    } else {
+        self = [super init];
+    }
+    
     if (self) {
         focalLength = kDefaultFocalLength;
         self.backgroundColor = [UIColor clearColor];
+        self.fillContentViewToBounds = YES;
     }
     return self;
+}
+
+-(id)init
+{
+    return [self initWithCoder:nil orFrame:CGRectNull];
 }
 
 -(id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame];
-    if (self) {
-        focalLength = kDefaultFocalLength;
-        self.backgroundColor = [UIColor clearColor];
-    }
-    return self;
+    return [self initWithCoder:nil orFrame:frame];
 }
 
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        focalLength = kDefaultFocalLength;
-    }
-    return self;
+    return [self initWithCoder:aDecoder orFrame:CGRectNull];
 }
 
 -(void)dealloc
@@ -181,6 +187,10 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     [contentView removeFromSuperview];
     
     contentView = [aContentView retain];
+    
+    if (self.fillContentViewToBounds) {
+        aContentView.frame = self.bounds;
+    }
     [self addSubview:contentView];
 }
 

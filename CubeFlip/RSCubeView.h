@@ -22,6 +22,7 @@ typedef enum {
 
 @property (nonatomic, retain) IBOutlet UIView* contentView;
 @property (nonatomic, assign) CGFloat focalLength;
+@property (nonatomic, assign) BOOL fillContentViewToBounds;
 
 -(void)rotateToView:(UIView*)aView direction:(RSCubeViewRotationDirection)aDirection duration:(NSTimeInterval)aDuration;
 
