@@ -23,28 +23,18 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 @interface RSCubeView()
 @property (nonatomic, assign) BOOL isAnimating;
-@property (nonatomic, retain) UIView* nextView;
-@property (nonatomic, retain) CALayer* animationLayer;
-@property (nonatomic, retain) CALayer* fadeOutLayer;
-@property (nonatomic, retain) CALayer* fadeOutMaskLayer;
-@property (nonatomic, retain) CALayer* fadeInLayer;
-@property (nonatomic, retain) CALayer* fadeInMaskLayer;
+@property (nonatomic, strong) UIView* nextView;
+@property (nonatomic, strong) CALayer* animationLayer;
+@property (nonatomic, strong) CALayer* fadeOutLayer;
+@property (nonatomic, strong) CALayer* fadeOutMaskLayer;
+@property (nonatomic, strong) CALayer* fadeInLayer;
+@property (nonatomic, strong) CALayer* fadeInMaskLayer;
 
 -(CALayer*)layerFromView:(UIView*)aView withTransform:(CATransform3D)transform;
 -(void)rotateInDirection:(RSCubeViewRotationDirection)aDirection duration:(float)aDuration;
 @end
 
 @implementation RSCubeView
-@synthesize contentView;
-@synthesize isAnimating;
-@synthesize nextView;
-@synthesize animationLayer;
-@synthesize fadeOutLayer;
-@synthesize fadeOutMaskLayer;
-@synthesize fadeInLayer;
-@synthesize fadeInMaskLayer;
-@synthesize focalLength;
-@synthesize fillContentViewToBounds;
 
 //Designated Initializer
 -(id)initWithCoder:(NSCoder*)aDecoder orFrame:(CGRect)frame
@@ -58,7 +48,7 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     }
     
     if (self) {
-        focalLength = kDefaultFocalLength;
+        _focalLength = kDefaultFocalLength;
         self.backgroundColor = [UIColor clearColor];
         self.fillContentViewToBounds = YES;
     }
@@ -78,18 +68,6 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 -(id)initWithCoder:(NSCoder *)aDecoder
 {
     return [self initWithCoder:aDecoder orFrame:CGRectNull];
-}
-
--(void)dealloc
-{
-    [contentView release];
-    [nextView release];
-    [fadeOutLayer release];
-    [fadeOutMaskLayer release];
-    [fadeInLayer release];
-    [fadeInMaskLayer release];
-    [animationLayer release];
-    [super dealloc];
 }
 
 - (CALayer*) layerFromView:(UIView*)aView withTransform:(CATransform3D)transform
@@ -137,61 +115,62 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     if (aDirection == RSCubeViewRotationDirectionDown)
     {
         translation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.y"];
-        translation.toValue = [NSNumber numberWithFloat:(self.bounds.size.height / 2)];
+        translation.toValue = @(self.bounds.size.height / 2);
         rotation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.rotation.x"]; 
         rotation.toValue = [NSNumber numberWithFloat:-M_PI_2];
         translationZ = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.z"];
-        translationZ.toValue = [NSNumber numberWithFloat:-(self.bounds.size.height / 2)];
+        translationZ.toValue = @(-(self.bounds.size.height / 2));
     } else if (aDirection == RSCubeViewRotationDirectionUp) {
         translation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.y"];
-        translation.toValue = [NSNumber numberWithFloat:-(self.bounds.size.height / 2)];
+        translation.toValue = @(-(self.bounds.size.height / 2));
         rotation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.rotation.x"]; 
         rotation.toValue = [NSNumber numberWithFloat:M_PI_2];
         translationZ = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.z"];
-        translationZ.toValue = [NSNumber numberWithFloat:-(self.bounds.size.height / 2)];
+        translationZ.toValue = @(-(self.bounds.size.height / 2));
     } else if (aDirection == RSCubeViewRotationDirectionLeft) {
         translation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.x"];
-        translation.toValue = [NSNumber numberWithFloat:-(self.bounds.size.width / 2)];
+        translation.toValue = @(-(self.bounds.size.width / 2));
         rotation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.rotation.y"]; 
         rotation.toValue = [NSNumber numberWithFloat:-M_PI_2];
         translationZ = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.z"];
-        translationZ.toValue = [NSNumber numberWithFloat:-(self.bounds.size.width / 2)];
+        translationZ.toValue = @(-(self.bounds.size.width / 2));
     } else {
         translation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.x"];
-        translation.toValue = [NSNumber numberWithFloat:(self.bounds.size.width / 2)];
+        translation.toValue = @(self.bounds.size.width / 2);
         rotation = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.rotation.y"]; 
         rotation.toValue = [NSNumber numberWithFloat:M_PI_2];
         translationZ = [CABasicAnimation animationWithKeyPath:@"sublayerTransform.translation.z"];
-        translationZ.toValue = [NSNumber numberWithFloat:-(self.bounds.size.width / 2)];
+        translationZ.toValue = @(-(self.bounds.size.width / 2));
     }
     
-    fadeOut.fromValue = [NSNumber numberWithFloat:0.0f];
-    fadeOut.toValue = [NSNumber numberWithFloat:0.4f];
-    fadeIn.fromValue = [NSNumber numberWithFloat:0.4f];
-    fadeIn.toValue = [NSNumber numberWithFloat:0.0f];
+    fadeOut.fromValue = @0.0f;
+    fadeOut.toValue = @0.4f;
+    fadeIn.fromValue = @0.4f;
+    fadeIn.toValue = @0.0f;
     
-    group.animations = [NSArray arrayWithObjects: rotation, translation, translationZ, nil];
+    group.animations = @[rotation, translation, translationZ];
     group.fillMode = kCAFillModeForwards; 
     group.removedOnCompletion = NO;
     
     [CATransaction begin];
-    [animationLayer addAnimation:group forKey:kFlipAnimationKey];
-    [fadeOutMaskLayer addAnimation:fadeOut forKey:kFadeOutAnimationKey];
-    [fadeInMaskLayer addAnimation:fadeIn forKey:kFadeInAnimationKey];
+    [_animationLayer addAnimation:group forKey:kFlipAnimationKey];
+    [_fadeOutMaskLayer addAnimation:fadeOut forKey:kFadeOutAnimationKey];
+    [_fadeInMaskLayer addAnimation:fadeIn forKey:kFadeInAnimationKey];
     [CATransaction commit];
 }
 
 -(void)setContentView:(UIView *)aContentView
 {
-    [contentView autorelease];
-    [contentView removeFromSuperview];
-    
-    contentView = [aContentView retain];
-    
-    if (self.fillContentViewToBounds) {
-        aContentView.frame = self.bounds;
+    if (_contentView != aContentView) {
+        [_contentView removeFromSuperview];
+        _contentView = aContentView;
+        
+        if (self.fillContentViewToBounds) {
+            aContentView.frame = self.bounds;
+        }
+        
+        [self addSubview:aContentView];
     }
-    [self addSubview:contentView];
 }
 
 -(void)rotateToView:(UIView *)aView direction:(RSCubeViewRotationDirection)aDirection duration:(NSTimeInterval)aDuration
@@ -205,7 +184,7 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
      5) Replace view with new content
      */
     
-    if (isAnimating || aView == nil) {
+    if (_isAnimating || aView == nil) {
         return;
     }
     
@@ -217,23 +196,23 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     
     //Construct transform layer
     self.animationLayer = [CALayer layer];
-    animationLayer.frame = self.bounds;
+    _animationLayer.frame = self.bounds;
     
     //Make sublayer transform. All sublayers will have this transform
     CATransform3D sublayerTransform = CATransform3DIdentity;
     
     sublayerTransform.m34 = 1.0 / - self.focalLength; //perspective
-    [animationLayer setSublayerTransform:sublayerTransform];
+    [_animationLayer setSublayerTransform:sublayerTransform];
     
-    [self.layer addSublayer:animationLayer];
+    [self.layer addSublayer:_animationLayer];
     
     //Init Fade-out layer. This is the surface that will disappear
     CATransform3D t = CATransform3DMakeTranslation(0.f, 0.f, 0.f);
-    self.fadeOutLayer = [self layerFromView:contentView withTransform:t];
-    [animationLayer addSublayer:self.fadeOutLayer];
+    self.fadeOutLayer = [self layerFromView:_contentView withTransform:t];
+    [_animationLayer addSublayer:self.fadeOutLayer];
     
     //Init Fade out mask layer, used for fade options
-    UIView* v = [[UIView alloc] initWithFrame:contentView.frame];
+    UIView* v = [[UIView alloc] initWithFrame:_contentView.frame];
     if (aDirection == RSCubeViewRotationDirectionDown) {
         v.backgroundColor = [UIColor blackColor];
     } else if (aDirection == RSCubeViewRotationDirectionUp) {
@@ -242,10 +221,10 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         v.backgroundColor = [UIColor darkGrayColor];
     }
     self.fadeOutMaskLayer = [self layerFromView:v withTransform:t];
-    [animationLayer addSublayer:fadeOutMaskLayer];
+    [_animationLayer addSublayer:_fadeOutMaskLayer];
     
     //Hide the actual content view during animation
-    contentView.hidden = YES;
+    _contentView.hidden = YES;
     
     //Init the Fade-In Layer. This is the surface that will appear next
     if (aDirection == RSCubeViewRotationDirectionDown) {
@@ -265,7 +244,7 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     
     self.fadeInLayer = [self layerFromView:aView withTransform:t];
     //self.fadeInLayer.opacity = kOpacityFaded;
-    [animationLayer addSublayer:self.fadeInLayer];
+    [_animationLayer addSublayer:self.fadeInLayer];
     
     //Init the Fade In Layer Mask
     if (aDirection == RSCubeViewRotationDirectionDown) {
@@ -276,7 +255,7 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
         v.backgroundColor = [UIColor darkGrayColor];
     }
     self.fadeInMaskLayer = [self layerFromView:v withTransform:t];
-    [animationLayer addSublayer:fadeInMaskLayer];
+    [_animationLayer addSublayer:_fadeInMaskLayer];
     
     [self rotateInDirection:aDirection duration:aDuration];
 }
@@ -285,23 +264,23 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 - (void)animationDidStart:(CAAnimation *)animation {
 	
-	isAnimating = YES;
-    [contentView removeFromSuperview];
-    [contentView setHidden:NO];
+	_isAnimating = YES;
+    [_contentView removeFromSuperview];
+    [_contentView setHidden:NO];
 }
 
 - (void)animationDidStop:(CAAnimation *)animation finished:(BOOL)finished {
 	
-	isAnimating = NO;
-    self.contentView = nextView;
+	_isAnimating = NO;
+    self.contentView = _nextView;
     
-    [animationLayer removeFromSuperlayer];
+    [_animationLayer removeFromSuperlayer];
     self.fadeOutLayer = nil;
     self.fadeOutMaskLayer = nil;
     self.fadeInLayer = nil;
     self.fadeInMaskLayer = nil;
     self.animationLayer = nil;
-    nextView = nil;
+    self.nextView = nil;
 }
 
 @end

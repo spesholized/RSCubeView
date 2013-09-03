@@ -20,7 +20,7 @@ typedef enum {
 
 @interface RSCubeView : UIView
 
-@property (nonatomic, retain) IBOutlet UIView* contentView;
+@property (nonatomic, strong) IBOutlet UIView* contentView;
 @property (nonatomic, assign) CGFloat focalLength;
 @property (nonatomic, assign) BOOL fillContentViewToBounds;
 

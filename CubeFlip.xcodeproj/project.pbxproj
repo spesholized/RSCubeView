@@ -33,7 +33,7 @@
 		A09888D414D74D40003E2120 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		A09888D514D74D40003E2120 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		A09888D814D74D40003E2120 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
-		A09888DF14D74D4C003E2120 /* RSCubeView.h */ = {isa = PBXFileReference; fileEncoding = 4; path = RSCubeView.h; sourceTree = "<group>"; };
+		A09888DF14D74D4C003E2120 /* RSCubeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSCubeView.h; sourceTree = "<group>"; };
 		A09888E014D74D4C003E2120 /* RSCubeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSCubeView.m; sourceTree = "<group>"; };
 		A09888E214D75127003E2120 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -248,7 +248,7 @@
 		A09888DD14D74D40003E2120 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CubeFlip/CubeFlip-Prefix.pch";
 				INFOPLIST_FILE = "CubeFlip/CubeFlip-Info.plist";
@@ -260,7 +260,7 @@
 		A09888DE14D74D40003E2120 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "CubeFlip/CubeFlip-Prefix.pch";
 				INFOPLIST_FILE = "CubeFlip/CubeFlip-Info.plist";
@@ -288,6 +288,7 @@
 				A09888DE14D74D40003E2120 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

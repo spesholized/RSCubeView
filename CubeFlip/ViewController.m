@@ -24,7 +24,7 @@
 {
     [super viewDidLoad];
     
-    UIView* contentView = [[[UIView alloc] initWithFrame:self.cubeView.bounds] autorelease];
+    UIView* contentView = [[UIView alloc] initWithFrame:self.cubeView.bounds];
     contentView.backgroundColor = [UIColor orangeColor];
     [self.cubeView setContentView:contentView];
 }
@@ -64,14 +64,10 @@
     return YES;
 }
 
-- (void)dealloc {
-    [cubeView release];
-    [super dealloc];
-}
 - (IBAction)onButtonTapped:(id)sender {
     
     //Alternate between the 2 prototype views
-    UIView* nextView = [[[UIView alloc] initWithFrame:self.cubeView.bounds] autorelease];
+    UIView* nextView = [[UIView alloc] initWithFrame:self.cubeView.bounds];
     nextView.backgroundColor = [UIColor orangeColor];
     
     NSInteger tag = ((UIButton*)sender).tag;

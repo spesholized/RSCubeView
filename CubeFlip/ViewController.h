@@ -11,6 +11,6 @@
 @class RSCubeView;
 @interface ViewController : UIViewController
 
-@property (retain, nonatomic) IBOutlet RSCubeView *cubeView;
+@property (strong, nonatomic) IBOutlet RSCubeView *cubeView;
 - (IBAction)onButtonTapped:(id)sender;
 @end
