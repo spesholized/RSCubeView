@@ -18,13 +18,13 @@ Open `CubeFlip.xcodeproj` in XCode to immediately see RSCubeView in action.
     
     CGRect rect = CGRectMake(0.f, 0.f, 200.f, 200.f);
     
-    RSCubeView* cube = [[[RSCubeView alloc] initWithFrame:rect] autorelease];
+    RSCubeView* cube = [[RSCubeView alloc] initWithFrame:rect];
     [self.view addSubview:cube]; //Add as a subview to your main view
         
-    UIView* redView = [[[UIView alloc] initWithFrame:rect] autorelease];
+    UIView* redView = [[UIView alloc] initWithFrame:rect];
     redView.backgroundColor = [UIColor redColor];
         
-    UIView* blueView = [[[UIView alloc] initWithFrame:rect] autorelease];
+    UIView* blueView = [[UIView alloc] initWithFrame:rect];
     blueView.backgroundColor = [UIColor blueColor];
         
     cube.contentView = redView;
